@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Invitation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; padding: 20px; }
+        .email-container { max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .email-header { background: linear-gradient(135deg, #0066cc 0%, #004999 100%); color: white; padding: 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .email-body { padding: 30px; text-align: center; }
+        .greeting { font-size: 20px; color: #2c3e50; margin-bottom: 15px; }
+        .project-highlight { background: #e8f4fd; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .project-name { font-size: 22px; font-weight: 600; color: #0066cc; }
+        .inviter { color: #666; margin: 15px 0; }
+        .cta-section { margin: 25px 0; }
+        .cta-button { display: inline-block; background: #4CAF50; color: white; text-decoration: none; padding: 14px 35px; border-radius: 25px; font-weight: 600; font-size: 16px; }
+        .expiry { color: #888; font-size: 13px; margin-top: 10px; }
+        .email-footer { background: #2c3e50; color: white; padding: 20px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <div class="logo">Project Tracker</div>
+        </div>
+
+        <div class="email-body">
+            <h2 class="greeting">You're Invited! 🎉</h2>
+            
+            <p>Join your team and start collaborating!</p>
+
+            <div class="project-highlight">
+                <div class="project-name">{{ project_name }}</div>
+            </div>
+
+            <div class="inviter">
+                Invited by <strong>{{ inviter_name }}</strong>
+            </div>
+
+            <div class="cta-section">
+                <a href="{{ invite_link }}" class="cta-button">Accept Invitation</a>
+                <div class="expiry">⏰ Expires in 48 hours</div>
+            </div>
+
+            <div style="color: #666; font-size: 12px; margin-top: 20px;">
+                <p>If the button doesn't work, use this link:</p>
+                <p style="word-break: break-all; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 5px;">
+                    {{ invite_link }}
+                </p>
+            </div>
+        </div>
+
+        <div class="email-footer">
+            &copy; 2025 Project Tracker. Sent to {{ recipient_email }}
+        </div>
+    </div>
+</body>
+</html>

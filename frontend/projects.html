@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects | Project Tracker</title>
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004999;
+            --primary-light: #e6f0ff;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h2 {
+            font-size: 28px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: var(--secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: var(--white);
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .project-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            flex: 1;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: var(--transition);
+            color: var(--secondary);
+            font-size: 16px;
+        }
+
+        .action-btn:hover {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .invite-btn:hover {
+            color: var(--info);
+        }
+
+        .edit-btn:hover {
+            color: var(--primary);
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .project-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+
+        .status-completed {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--secondary);
+        }
+
+        .status-on_hold {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+
+        .status-overdue {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .project-description {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .members-list {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-email {
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .member-role {
+            font-size: 12px;
+            color: var(--secondary);
+            background: var(--light);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .no-members {
+            text-align: center;
+            color: var(--secondary);
+            font-style: italic;
+            padding: 10px 0;
+        }
+
+        .project-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .project-date {
+            font-size: 12px;
+            color: var(--secondary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .pagination-btn {
+            padding: 10px 20px;
+            background: var(--white);
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: var(--secondary);
+            font-size: 14px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--box-shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--secondary);
+        }
+
+        .close-btn:hover {
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Invite Modal Styles */
+        .invite-form {
+            margin-top: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: var(--white);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+        }
+
+        .invited-members-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .invited-member {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--light);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .remove-member {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .remove-member:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .loader {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--danger);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--secondary);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .project-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                width: 100%;
+            }
+            
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <h1>Project Tracker</h1>
+            </div>
+            <div class="user-menu">
+                <span id="userEmail"></span>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <h2>My Projects</h2>
+                <p>Manage and track all your projects in one place</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="createProjectBtn">
+                    <span>+ Create Project</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select class="filter-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On Hold</option>
+                <option value="overdue">Overdue</option>
+            </select>
+        </div>
+
+        <div id="projectsContainer">
+            <div class="loader">
+                <div class="loader-spinner"></div>
+                <p>Loading projects...</p>
+            </div>
+        </div>
+
+        <div class="pagination" id="paginationContainer" style="display: none;">
+            <button class="pagination-btn" id="prevBtn" disabled>Previous</button>
+            <span class="page-info" id="pageInfo">Page 1 of 1</span>
+            <button class="pagination-btn" id="nextBtn" disabled>Next</button>
+        </div>
+    </main>
+
+    <!-- Create/Edit Project Modal -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Create Project</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label class="form-label" for="projectName">Project Name *</label>
+                    <input type="text" class="form-input" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectDescription">Description *</label>
+                    <textarea class="form-textarea" id="projectDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectLocation">Location *</label>
+                    <input type="text" class="form-input" id="projectLocation" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectStatus">Status *</label>
+                    <select class="form-select" id="projectStatus" required>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="on_hold">On Hold</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectStartDate">Start Date *</label>
+                    <input type="date" class="form-input" id="projectStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectEndDate">End Date *</label>
+                    <input type="date" class="form-input" id="projectEndDate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitProjectBtn">
+                        <span>Create Project</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Project</h3>
+                <button class="close-btn" id="closeDeleteModal">&times;</button>
+            </div>
+            <p>Are you sure you want to delete this project? This action cannot be undone.</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-cancel" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <span>Delete Project</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Members Modal -->
+    <div class="modal" id="inviteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="inviteModalTitle">Invite Members</h3>
+                <button class="close-btn" id="closeInviteModal">&times;</button>
+            </div>
+            <div class="invite-form">
+                <div class="form-group">
+                    <label class="form-label">Add Member by Email</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="email" class="form-input" id="memberEmail" placeholder="Enter email address">
+                        </div>
+                        <button type="button" class="btn-add" id="addMemberBtn">Add</button>
+                    </div>
+                </div>
+                
+                <div class="invited-members-list" id="invitedMembersList">
+                    <div class="no-members">No members added yet</div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelInviteBtn">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="sendInvitesBtn">
+                        <span>Send Invitations</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000/api/";
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentStatus = '';
+        let currentEditingProject = null;
+        let currentDeletingProject = null;
+        let currentInvitingProject = null;
+        let invitedMembers = [];
+
+        // DOM Elements
+        const projectsContainer = document.getElementById('projectsContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const statusFilter = document.getElementById('statusFilter');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userEmailElement = document.getElementById('userEmail');
+        const createProjectBtn = document.getElementById('createProjectBtn');
+        const projectModal = document.getElementById('projectModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const inviteModal = document.getElementById('inviteModal');
+        const projectForm = document.getElementById('projectForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const submitProjectBtn = document.getElementById('submitProjectBtn');
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const accessToken = localStorage.getItem('access');
+            if (!accessToken) {
+            console.log("No access token found, redirecting to home page");
+            window.location.href = '/';  // Redirect to your index.html page
+            return;
+        }
+            
+            const userEmail = localStorage.getItem('userEmail');
+            if (userEmail) {
+                userEmailElement.textContent = userEmail;
+            }
+            
+            loadProjects();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            statusFilter.addEventListener('change', function() {
+                currentStatus = this.value;
+                currentPage = 1;
+                loadProjects();
+            });
+
+            prevBtn.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadProjects();
+                }
+            });
+
+            nextBtn.addEventListener('click', function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    loadProjects();
+                }
+            });
+
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('access');
+                localStorage.removeItem('refresh');
+                localStorage.removeItem('userEmail');
+                window.location.href = '/';
+
+            });
+
+            createProjectBtn.addEventListener('click', function() {
+                openCreateModal();
+            });
+
+            // Project Modal
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            
+            // Delete Modal
+            document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+            
+            // Invite Modal
+            document.getElementById('closeInviteModal').addEventListener('click', closeInviteModal);
+            document.getElementById('cancelInviteBtn').addEventListener('click', closeInviteModal);
+            document.getElementById('addMemberBtn').addEventListener('click', addMemberToList);
+            document.getElementById('sendInvitesBtn').addEventListener('click', sendInvitations);
+
+            projectForm.addEventListener('submit', handleProjectSubmit);
+
+            // Allow pressing Enter to add members
+            document.getElementById('memberEmail').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addMemberToList();
+                }
+            });
+        }
+
+        // Load projects with pagination
+        async function loadProjects() {
+            try {
+                showLoader();
+                
+                const accessToken = localStorage.getItem('access');
+                console.log(accessToken )
+                let url = `${API_BASE}projects/?page=${currentPage}`;
+                
+                if (currentStatus) {
+                    url += `&status=${currentStatus}`;
+                }
+
+                let response = await fetchWithAuth(url, 'GET');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayProjects(data);
+                updatePagination(data);
+
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                console.log("No access token found, redirecting to home page");
+                window.location.href = '/'; 
+            }
+        }
+
+        // Fetch with automatic token refresh
+        async function fetchWithAuth(url, method, body = null) {
+            const accessToken = localStorage.getItem('access');
+            const options = {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            let response = await fetch(url, options);
+
+            // If token is expired, try to refresh it
+            if (response.status === 401) {
+                const refreshed = await refreshToken();
+                if (refreshed) {
+                    const newAccessToken = localStorage.getItem('access');
+                    options.headers.Authorization = `Bearer ${newAccessToken}`;
+                    response = await fetch(url, options);
+                } else {
+                    // Token refresh failed, redirect to login
+                    window.location.href = '';
+                    return;
+                }
+            }
+
+            return response;
+        }
+
+        // Refresh access token
+        async function refreshToken() {
+            try {
+                const refreshToken = localStorage.getItem('refresh');
+                if (!refreshToken) {
+                    return false;
+                }
+
+                const response = await fetch(`${API_BASE}auth/token/refresh/`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access', data.access);
+                    return true;
+                } else {
+                    localStorage.removeItem('access');
+                    localStorage.removeItem('refresh');
+                    localStorage.removeItem('userEmail');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error refreshing token:', error);
+                return false;
+            }
+        }
+
+        function displayProjects(data) {
+            const projects = data.results;
+            const userRole = localStorage.getItem("userRole");
+            const isManager = userRole === 'manager';
+
+            if (!projects || projects.length === 0) {
+                projectsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No projects found</h3>
+                        <p>There are no projects matching your current filters.</p>
+                        ${isManager ? `
+                            <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 20px;">
+                                Create Your First Project
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            const projectsHTML = projects.map(project => `
+                <div class="project-card">
+                    <div class="project-header">
+                        <div>
+                            <h3 class="project-title">${project.name}</h3>
+                            <span class="project-status status-${project.status}">${project.status.replace('_', ' ')}</span>
+                        </div>
+                        <div class="project-actions">
+                            <!-- View Project Button - Available for all roles -->
+                            <button class="action-btn view-btn" onclick="viewProjectTasks('${project.slug}')" title="View Project Details">
+                                👁️
+                            </button>
+                            ${isManager ? `
+                                <!-- Manager-only actions -->
+                                <button class="action-btn invite-btn" onclick="openInviteModal('${project.slug}', '${project.name}')" title="Invite Members">
+                                    👥
+                                </button>
+                                <button class="action-btn edit-btn" onclick="openEditModal('${project.slug}')" title="Edit Project">
+                                    ✏️
+                                </button>
+                                <button class="action-btn delete-btn" onclick="openDeleteModal('${project.slug}', '${project.name}')" title="Delete Project">
+                                    🗑️
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <p class="project-description">${project.description}</p>
+                    
+                    <div class="project-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">📍 Location</span>
+                            <span class="meta-value">${project.location}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">📅 Start Date</span>
+                            <span class="meta-value">${formatDate(project.start_date)}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">📅 End Date</span>
+                            <span class="meta-value">${formatDate(project.end_date)}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">👥 Members</span>
+                            <span class="meta-value">${project.members.length} member(s)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-footer">
+                        <small class="project-date">Created: ${formatDateTime(project.created_at)}</small>
+                        <small class="project-date">Updated: ${formatDateTime(project.updated_at)}</small>
+                    </div>
+                </div>
+            `).join('');
+
+            projectsContainer.innerHTML = `
+                <div class="projects-grid">
+                    ${projectsHTML}
+                </div>
+            `;
+        }
+
+        function viewProjectTasks(slug) {
+            window.location.href = `/tasks?project=${slug}`;
+        }
+
+        // Update pagination controls
+        function updatePagination(data) {
+            if (data.count === 0) {
+                paginationContainer.style.display = 'none';
+                return;
+            }
+
+            totalPages = Math.ceil(data.count / 5);
+            paginationContainer.style.display = 'flex';
+            
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || !data.next;
+            
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages} (${data.count} total projects)`;
+        }
+
+        // Project Modal Functions
+        function openCreateModal() {
+            currentEditingProject = null;
+            modalTitle.textContent = 'Create Project';
+            submitProjectBtn.innerHTML = '<span>Create Project</span>';
+            projectForm.reset();
+            projectModal.classList.add('active');
+        }
+
+        async function openEditModal(slug) {
+            try {
+                // Show loader in the projects container, not the modal
+                showLoader();
+                
+                const response = await fetchWithAuth(`${API_BASE}projects/${slug}/edit/`, 'GET');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch project details');
+                }
+
+                const result = await response.json();
+                
+                if (!result.success || !result.data) {
+                    throw new Error('Invalid response format');
+                }
+
+                const project = result.data;
+                currentEditingProject = project;
+
+                // Populate form with project data
+                document.getElementById('projectName').value = project.name || '';
+                document.getElementById('projectDescription').value = project.description || '';
+                document.getElementById('projectLocation').value = project.location || '';
+                document.getElementById('projectStatus').value = project.status || 'active';
+                document.getElementById('projectStartDate').value = project.start_date || '';
+                document.getElementById('projectEndDate').value = project.end_date || '';
+
+                modalTitle.textContent = 'Edit Project';
+                submitProjectBtn.innerHTML = '<span>Update Project</span>';
+                projectModal.classList.add('active');
+                
+            } catch (error) {
+                console.error('Error loading project for edit:', error);
+                showError('Failed to load project details: ' + error.message);
+                // Reload projects to clear the loader state
+                loadProjects();
+            }
+        }
+
+        function openDeleteModal(slug, projectName) {
+            currentDeletingProject = slug;
+            document.querySelector('#deleteModal p').textContent = 
+                `Are you sure you want to delete "${projectName}"? This action cannot be undone.`;
+            deleteModal.classList.add('active');
+        }
+
+        function closeModal() {
+            projectModal.classList.remove('active');
+            currentEditingProject = null;
+            // Make sure to reload projects to clear any stuck loader state
+            loadProjects();
+        }
+
+        function closeDeleteModal() {
+            deleteModal.classList.remove('active');
+            currentDeletingProject = null;
+        }
+
+        // Handle project creation/editing
+        async function handleProjectSubmit(e) {
+            e.preventDefault();
+            
+            try {
+                setButtonLoading(submitProjectBtn, true);
+
+                const projectData = {
+                    name: document.getElementById('projectName').value,
+                    description: document.getElementById('projectDescription').value,
+                    location: document.getElementById('projectLocation').value,
+                    status: document.getElementById('projectStatus').value,
+                    start_date: document.getElementById('projectStartDate').value,
+                    end_date: document.getElementById('projectEndDate').value
+                };
+
+                let response;
+                if (currentEditingProject) {
+                    // Edit existing project
+                    response = await fetchWithAuth(
+                        `${API_BASE}projects/${currentEditingProject.slug}/edit/`,
+                        'PATCH',
+                        projectData
+                    );
+                } else {
+                    // Create new project
+                    response = await fetchWithAuth(
+                        `${API_BASE}projects/create/`,
+                        'POST',
+                        projectData
+                    );
+                }
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    closeModal();
+                    loadProjects();
+                    showSuccess(currentEditingProject ? 'Project updated successfully!' : 'Project created successfully!');
+                } else {
+                    const errorMessage = result.message || result.errors || 'Failed to save project';
+                    throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error('Error saving project:', error);
+                showError(error.message || 'Failed to save project. Please try again.');
+            } finally {
+                setButtonLoading(submitProjectBtn, false);
+            }
+        }
+
+        // Handle project deletion
+        async function confirmDelete() {
+            try {
+                setButtonLoading(document.getElementById('confirmDeleteBtn'), true);
+
+                const response = await fetchWithAuth(
+                    `${API_BASE}projects/${currentDeletingProject}/delete/`,
+                    'DELETE'
+                );
+
+                if (response.ok) {
+                    closeDeleteModal();
+                    loadProjects();
+                    showSuccess('Project deleted successfully!');
+                } else {
+                    throw new Error('Failed to delete project');
+                }
+            } catch (error) {
+                console.error('Error deleting project:', error);
+                showError('Failed to delete project. Please try again.');
+            } finally {
+                setButtonLoading(document.getElementById('confirmDeleteBtn'), false);
+            }
+        }
+
+        // Invite Modal Functions
+        function openInviteModal(slug, projectName) {
+            currentInvitingProject = slug;
+            invitedMembers = [];
+            document.getElementById('inviteModalTitle').textContent = `Invite Members to ${projectName}`;
+            document.getElementById('memberEmail').value = '';
+            updateInvitedMembersList();
+            inviteModal.classList.add('active');
+        }
+
+        function closeInviteModal() {
+            inviteModal.classList.remove('active');
+            currentInvitingProject = null;
+            invitedMembers = [];
+        }
+
+        function addMemberToList() {
+            const emailInput = document.getElementById('memberEmail');
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                showError('Please enter an email address');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            if (invitedMembers.includes(email)) {
+                showError('This email is already in the invitation list');
+                return;
+            }
+
+            invitedMembers.push(email);
+            emailInput.value = '';
+            updateInvitedMembersList();
+        }
+
+        function updateInvitedMembersList() {
+            const listContainer = document.getElementById('invitedMembersList');
+            
+            if (invitedMembers.length === 0) {
+                listContainer.innerHTML = '<div class="no-members">No members added yet</div>';
+                return;
+            }
+
+            listContainer.innerHTML = invitedMembers.map(email => `
+                <div class="invited-member">
+                    <span>${email}</span>
+                    <button type="button" class="remove-member" onclick="removeMember('${email}')">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeMember(email) {
+            invitedMembers = invitedMembers.filter(e => e !== email);
+            updateInvitedMembersList();
+        }
+
+        async function sendInvitations() {
+            if (invitedMembers.length === 0) {
+                showError('Please add at least one member to invite');
+                return;
+            }
+
+            try {
+                setButtonLoading(document.getElementById('sendInvitesBtn'), true);
+
+                // Prepare request data based on number of emails
+                const requestData = invitedMembers.length === 1 
+                    ? { email: invitedMembers[0] }  // Single email
+                    : { emails: invitedMembers };   // List of emails
+
+                const response = await fetchWithAuth(
+                    `${API_BASE}projects/${currentInvitingProject}/invite/`,
+                    'POST',
+                    requestData
+                );
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    closeInviteModal();
+                    loadProjects();
+                    
+                    // Use backend message or create our own
+                    const successMessage = result.message || `Invitations sent successfully to ${invitedMembers.length} member(s)!`;
+                    showSuccess(successMessage);
+                } else {
+                    const errorMessage = result.message || result.errors || 'Failed to send invitations';
+                    throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error('Error sending invitations:', error);
+                showError('Failed to send invitations: ' + error.message);
+            } finally {
+                setButtonLoading(document.getElementById('sendInvitesBtn'), false);
+            }
+        }
+
+        // Utility functions
+        function showLoader() {
+            projectsContainer.innerHTML = `
+                <div class="loader">
+                    <div class="loader-spinner"></div>
+                    <p>Loading projects...</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        function showSuccess(message) {
+            alert('Success: ' + message);
+        }
+
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.disabled = true;
+                const originalText = button.querySelector('span').textContent;
+                button.innerHTML = '<div class="loader-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>';
+                button.dataset.originalText = originalText;
+            } else {
+                button.disabled = false;
+                button.innerHTML = `<span>${button.dataset.originalText}</span>`;
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return 'N/A';
+            const date = new Date(dateTimeString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Make functions available globally
+        window.openCreateModal = openCreateModal;
+        window.openEditModal = openEditModal;
+        window.openDeleteModal = openDeleteModal;
+        window.openInviteModal = openInviteModal;
+        window.removeMember = removeMember;
+        window.loadProjects = loadProjects;
+    </script>
+</body>
+</html>

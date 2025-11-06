@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; }
+        .content { padding: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Task Overdue</h2>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            <p>The task <strong>{{ task_title }}</strong> for project <strong>{{ project_name }}</strong> was due on <strong>{{ due_date }}</strong> and is now {{ days_overdue }} day(s) overdue.</p>
+            <p>Please complete this task as soon as possible.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accept Invitation | Project Tracker</title>
+  <style>
+    :root {
+      --primary: #0066cc;
+      --primary-dark: #004999;
+      --primary-light: #e6f0ff;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --white: #ffffff;
+      --border-radius: 12px;
+      --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .container:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      padding: 30px 25px;
+      text-align: center;
+    }
+
+    .header h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 15px;
+    }
+
+    .content {
+      padding: 30px 25px;
+    }
+
+    .invite-info {
+      background: var(--primary-light);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+      text-align: center;
+      border-left: 4px solid var(--primary);
+    }
+
+    .project-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
+    }
+
+    .inviter {
+      color: var(--secondary);
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: var(--transition);
+      background: var(--white);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    input::placeholder {
+      color: #adb5bd;
+    }
+
+    .name-fields {
+      display: flex;
+      gap: 15px;
+    }
+
+    .name-fields .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 102, 204, 0.25);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background: #adb5bd;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: rgba(220, 53, 69, 0.08);
+      border-radius: 8px;
+      border-left: 4px solid var(--danger);
+    }
+
+    .success {
+      color: var(--success);
+      font-size: 14px;
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: rgba(40, 167, 69, 0.08);
+      border-radius: 8px;
+      border-left: 4px solid var(--success);
+    }
+
+    .loader {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 2px solid var(--white);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Password strength indicator */
+    .password-strength {
+      height: 4px;
+      background: #e9ecef;
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .password-strength-bar {
+      height: 100%;
+      width: 0;
+      transition: var(--transition);
+      border-radius: 2px;
+    }
+
+    .strength-weak {
+      background: var(--danger);
+      width: 33%;
+    }
+
+    .strength-medium {
+      background: var(--warning);
+      width: 66%;
+    }
+
+    .strength-strong {
+      background: var(--success);
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 16px;
+      }
+      
+      .content {
+        padding: 25px 20px;
+      }
+      
+      .name-fields {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .name-fields .form-group {
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Join Project</h2>
+      <p>Complete your registration to accept the invitation</p>
+    </div>
+    
+    <div class="content">
+      <div class="invite-info" id="inviteInfo">
+        <div class="project-name" id="projectName">Loading project...</div>
+        <div class="inviter" id="inviterInfo">Loading invitation details...</div>
+      </div>
+
+      <form id="registerForm">
+        <div class="name-fields">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First Name *</label>
+            <input type="text" id="firstName" placeholder="First name" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last Name *</label>
+            <input type="text" id="lastName" placeholder="Last name" required />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Password *</label>
+          <input type="password" id="password" placeholder="Password" required />
+          <div class="password-strength">
+            <div class="password-strength-bar" id="passwordStrength"></div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password *</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm password" required />
+        </div>
+        
+        <button type="submit" id="registerBtn">
+          <span>Accept Invitation & Join Project</span>
+        </button>
+      </form>
+      
+      <p id="errorMessage" class="error"></p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000/api/";
+    
+    // Get token from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    // DOM Elements
+    const registerForm = document.getElementById('registerForm');
+    const registerBtn = document.getElementById('registerBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const projectName = document.getElementById('projectName');
+    const inviterInfo = document.getElementById('inviterInfo');
+    const inviteInfo = document.getElementById('inviteInfo');
+
+    // Check if token exists
+    if (!token) {
+      showError('Invalid invitation link. No token provided.');
+      inviteInfo.style.display = 'none';
+    }
+
+    // Load invitation details
+    async function loadInvitationDetails() {
+      try {
+        projectName.textContent = 'Project Invitation';
+        inviterInfo.textContent = 'Complete registration to join the project';
+      } catch (error) {
+        console.error('Error loading invitation details:', error);
+      }
+    }
+
+    // Handle form submission
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMessage.textContent = '';
+
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Basic validation
+      if (!firstName || !lastName || !password || !confirmPassword) {
+        showError('Please fill in all fields');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match');
+        return;
+      }
+
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters');
+        return;
+      }
+
+      await registerWithInvitation(firstName, lastName, password, confirmPassword);
+    });
+
+    // Password strength indicator
+    document.getElementById('password').addEventListener('input', function() {
+      const password = this.value;
+      const strengthBar = document.getElementById('passwordStrength');
+      
+      strengthBar.className = 'password-strength-bar';
+      
+      if (password.length === 0) {
+        strengthBar.style.width = '0';
+      } else if (password.length < 6) {
+        strengthBar.classList.add('strength-weak');
+      } else if (password.length < 8) {
+        strengthBar.classList.add('strength-medium');
+      } else {
+        strengthBar.classList.add('strength-strong');
+      }
+    });
+
+   async function registerWithInvitation(firstName, lastName, password, confirmPassword) {
+    try {
+        setButtonLoading(registerBtn, true);
+
+        console.log("Sending registration request...");
+        const response = await fetch(`${API_BASE}invites/accept/${token}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+                password: password,
+                confirm_password: confirmPassword,
+                token: token
+            }),
+        });
+
+        console.log("Response status:", response.status);
+        const result = await response.json();
+        console.log("Full API response:", result);
+        alert("Full API response:", result)
+        if (response.ok && result.success) {
+            // Check if data exists
+            if (!result.data) {
+                throw new Error('No data in response');
+            }
+            
+            // Store tokens and redirect to projects page
+            localStorage.setItem("access", result.data.access);
+            localStorage.setItem("refresh", result.data.refresh);
+            localStorage.setItem("userEmail", result.data.email);
+            localStorage.setItem("userRole", result.data.role);
+            
+            // Verify storage immediately
+            const storedAccess = localStorage.getItem("access");
+            const storedRefresh = localStorage.getItem("refresh");
+            const storedEmail = localStorage.getItem("userEmail");
+            const storedRole = localStorage.getItem("userRole");
+            
+            console.log("Stored access token:", storedAccess ? "Present" : "Missing");
+            console.log("Stored refresh token:", storedRefresh ? "Present" : "Missing");
+            console.log("Stored email:", storedEmail);
+            console.log("Stored role:", storedRole);
+            
+            // Show alerts with actual values
+           
+            
+            console.log("Redirecting to projects page...");
+            window.location.href = "/projects";
+        } else {
+            const errorMsg = result.message || result.errors || 'Registration failed';
+            console.log("Registration failed:", errorMsg);
+            throw new Error(errorMsg);
+        }
+    } catch (error) {
+        console.error('Error during registration:', error);
+        showError('Registration failed: ' + error.message);
+    } finally {
+        setButtonLoading(registerBtn, false);
+    }
+}
+    function setButtonLoading(button, isLoading) {
+      if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = '<div class="loader"></div>';
+      } else {
+        button.disabled = false;
+        button.innerHTML = '<span>Accept Invitation & Join Project</span>';
+      }
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.className = 'error';
+    }
+
+    function showSuccess(message) {
+      errorMessage.textContent = message;
+      errorMessage.className = 'success';
+    }
+
+    // Load invitation details on page load
+    loadInvitationDetails();
+  </script>
+</body>
+</html>
