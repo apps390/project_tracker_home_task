@@ -1,11 +1,10 @@
-# tasks.py
 from celery import shared_task
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from .models import Project, Task
-from datetime import date, timedelta
+from project_tracker import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -70,8 +69,7 @@ def send_project_overdue_notification(project_id):
         # Send HTML-only email
         send_mail(
             subject=subject,
-            message='',  # Empty plain text
-            from_email=None,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             html_message=html_message,
             fail_silently=False,
@@ -154,8 +152,7 @@ def send_task_due_today_notification(task_id):
         # Send HTML-only email
         send_mail(
             subject=subject,
-            message='',  # Empty plain text
-            from_email=None,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             html_message=html_message,
             fail_silently=False,
@@ -198,8 +195,7 @@ def send_task_overdue_notification(task_id):
         # Send HTML-only email
         send_mail(
             subject=subject,
-            message='',  # Empty plain text
-            from_email=None,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             html_message=html_message,
             fail_silently=False,

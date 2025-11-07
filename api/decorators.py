@@ -10,10 +10,10 @@ def manager_required(view_func):
         user = request.user
 
         if not getattr(user, "is_authenticated", False):
-            return build_response(False, "Authentication required.", status_code=status.HTTP_401_UNAUTHORIZED)
+            return build_response(False, errors="Authentication required.", status_code=status.HTTP_401_UNAUTHORIZED)
         
         if getattr(user, "role", None) != "manager":
-            return build_response(False, "Access denied. Only project managers are allowed.", status_code=status.HTTP_403_FORBIDDEN)
+            return build_response(False, errors="Access denied. Only project managers are allowed.", status_code=status.HTTP_403_FORBIDDEN)
         
         return view_func(self, request, *args, **kwargs)
 

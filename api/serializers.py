@@ -235,7 +235,6 @@ class TaskListSerializer(serializers.ModelSerializer):
                 'id': contributor.id,
                 'email': contributor.user.email,
                 'name':contributor.user.first_name,
-                # Add other fields you need from Contributor model
             }
             for contributor in obj.assigned_to.all()
         ]
