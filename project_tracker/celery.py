@@ -11,7 +11,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'check-daily-notifications-midnight': {
         'task': 'api.tasks.check_daily_notifications',
-        'schedule': crontab(hour=0, minute=0),  # Daily at midnight
+        'schedule': crontab(minute='*/2'),  # Daily at midnight
     },
 }
 

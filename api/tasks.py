@@ -7,7 +7,7 @@ from .models import Project, Task
 from project_tracker import settings
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('tracker_logger')
 User = get_user_model()
 
 @shared_task
@@ -49,7 +49,7 @@ def send_project_overdue_notification(project_id):
         
         # Get recipients - project creator and all members
         recipients = [project.created_by.email]
-        members_emails = project.members.filter(is_deleted=False).values_list('user__email', flat=True)
+        members_emails = project.members.values_list('user__email', flat=True)
         recipients.extend(members_emails)
         
         # Remove duplicates and None values
@@ -69,6 +69,7 @@ def send_project_overdue_notification(project_id):
         # Send HTML-only email
         send_mail(
             subject=subject,
+            message=f"Project {project.name} is overdue as of {timezone.now().date()}",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             html_message=html_message,
@@ -132,11 +133,9 @@ def send_task_due_today_notification(task_id):
     try:
         task = Task.objects.get(id=task_id, is_deleted=False)
         
-        # Get recipients - assigned users and project manager
-        recipients = list(task.assigned_to.filter(is_deleted=False).values_list('user__email', flat=True))
+        recipients = list(task.assigned_to.values_list('user__email', flat=True))
         recipients.append(task.project.created_by.email)
         
-        # Remove duplicates and None values
         recipients = list(set([email for email in recipients if email]))
         
         subject = f"Task Due Today: {task.title}"
@@ -152,6 +151,7 @@ def send_task_due_today_notification(task_id):
         # Send HTML-only email
         send_mail(
             subject=subject,
+            message=f"Task {task.title} is ovedue as of {timezone.now().date()}",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             html_message=html_message,
@@ -175,7 +175,7 @@ def send_task_overdue_notification(task_id):
         task = Task.objects.get(id=task_id, is_deleted=False)
         
         # Get recipients - assigned users and project manager
-        recipients = list(task.assigned_to.filter(is_deleted=False).values_list('user__email', flat=True))
+        recipients = list(task.assigned_to.values_list('user__email', flat=True))
         recipients.append(task.project.created_by.email)
         
         # Remove duplicates and None values
@@ -195,6 +195,7 @@ def send_task_overdue_notification(task_id):
         # Send HTML-only email
         send_mail(
             subject=subject,
+            message =f"Task {task.title} is ovedue as of {timezone.now().date()}",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=recipients,
             html_message=html_message,
