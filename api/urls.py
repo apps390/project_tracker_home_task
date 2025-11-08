@@ -20,4 +20,5 @@ urlpatterns = [
 
     # ---------------------- PROJECT MEMBERS -------------------------
     path('projects/<slug:slug>/members/', ProjectMembersAPIView.as_view(), name='project-members'),
+    path('skills/add',ContributorSkillAPIView.as_view(),name='add_skill')
 ]

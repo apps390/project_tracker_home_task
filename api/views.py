@@ -490,8 +490,8 @@ class TaskListAPIView(generics.ListAPIView):
         try:
             project = (
                 Project.objects
-                .select_related('created_by')  # ✅ Eager load creator
-                .prefetch_related('members__user')  # ✅ Preload all member-user pairs
+                .select_related('created_by')  
+                .prefetch_related('members__user')  
                 .filter(slug=project_slug, is_deleted=False)
                 .filter(models.Q(created_by=user) | models.Q(members__user=user))
                 .distinct()
@@ -598,9 +598,12 @@ class ContributorSkillAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = SkillSerializer
 
+    def get_object(self):
+        return get_object_or_404(Contributor, user=self.request.user)
+
     def get(self, request):
         try:
-            contributor = get_object_or_404(Contributor, user=request.user)
+            contributor = self.get_object()
             serializer = self.get_serializer(contributor)
             return build_response(
                 success=True,
@@ -608,30 +611,57 @@ class ContributorSkillAPIView(generics.GenericAPIView):
                 data=serializer.data,
                 status_code=status.HTTP_200_OK
             )
-
         except Exception as e:
             logger.error(f"Error fetching skills: {str(e)}")
             return build_response(success=False, errors=str(e))
 
     def post(self, request):
         try:
-            contributor = get_object_or_404(Contributor, user=request.user)
-            serializer = self.get_serializer(contributor, data=request.data, partial=True)
-
+            contributor = self.get_object()
+            serializer = self.get_serializer(contributor, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
             return build_response(
                 success=True,
-                message="Skills updated successfully",
+                message="Skills added successfully",
                 data=serializer.data,
                 status_code=status.HTTP_200_OK
             )
 
         except ValidationError as e:
-            logger.warning(f"Validation error in ContributorSkillAPIView: {e}")
+            logger.warning(f"Validation error in ContributorSkillAPIView (POST): {e}")
             return build_response(success=False, errors=e.detail, status_code=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            logger.error(f"Unexpected error in ContributorSkillAPIView: {str(e)}")
+            logger.error(f"Unexpected error in ContributorSkillAPIView (POST): {str(e)}")
+            return build_response(success=False, errors=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def patch(self, request):
+        try:
+            contributor = self.get_object()
+            existing_skills = contributor.skills or []
+            new_skills = request.data.get("skills", [])
+
+            if not isinstance(new_skills, list):
+                raise ValidationError({"skills": ["Skills must be provided as a list."]})
+
+            merged_skills = list({skill.lower(): skill for skill in existing_skills + new_skills}.values())
+            contributor.skills = merged_skills
+            contributor.save(update_fields=["skills"])
+
+            serializer = self.get_serializer(contributor)
+            return build_response(
+                success=True,
+                message="Skills appended successfully",
+                data=serializer.data,
+                status_code=status.HTTP_200_OK
+            )
+
+        except ValidationError as e:
+            logger.warning(f"Validation error in ContributorSkillAPIView (PATCH): {e}")
+            return build_response(success=False, errors=e.detail, status_code=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Unexpected error in ContributorSkillAPIView (PATCH): {str(e)}")
             return build_response(success=False, errors=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
