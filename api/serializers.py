@@ -238,3 +238,8 @@ class TaskListSerializer(serializers.ModelSerializer):
             }
             for contributor in obj.assigned_to.all()
         ]
+    
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contributor
+        fields = ['skills']

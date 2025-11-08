@@ -774,20 +774,26 @@
         const modalTitle = document.getElementById('modalTitle');
         const submitProjectBtn = document.getElementById('submitProjectBtn');
 
-        // Check authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
             const accessToken = localStorage.getItem('access');
             if (!accessToken) {
             console.log("No access token found, redirecting to home page");
-            window.location.href = '/';  // Redirect to your index.html page
+            window.location.href = '/';  
             return;
         }
             
             const userEmail = localStorage.getItem('userEmail');
+            const userRole = localStorage.getItem('userRole'); 
             if (userEmail) {
                 userEmailElement.textContent = userEmail;
             }
-            
+            if (userRole && userRole.toLowerCase() === 'member') {
+                const createProjectBtn = document.getElementById('createProjectBtn');
+                if (createProjectBtn) {
+                    createProjectBtn.style.display = 'none';
+                }
+            }
+                    
             loadProjects();
             setupEventListeners();
         });
@@ -1152,11 +1158,12 @@
 
                 const result = await response.json();
                 
-                if (response.ok && result.success) {
+               if (response.ok && result.success) {
+                    showSuccess(currentEditingProject ? 'Project updated successfully!' : 'Project created successfully!');
                     closeModal();
                     loadProjects();
-                    showSuccess(currentEditingProject ? 'Project updated successfully!' : 'Project created successfully!');
-                } else {
+                }
+                else {
                     const errorMessage = result.message || result.errors || 'Failed to save project';
                     throw new Error(errorMessage);
                 }
