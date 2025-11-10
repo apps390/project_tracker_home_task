@@ -100,9 +100,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def is_overdue(self):
-        return self.status != 'completed' and self.due_date < timezone.now().date()
+
 
     def save(self, *args, **kwargs):
         if not self.slug:

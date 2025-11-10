@@ -87,9 +87,9 @@ WSGI_APPLICATION = 'project_tracker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'project_tracker',
-        'USER': 'project_user',
-        'PASSWORD': 'your_secure_password',
+        'NAME': 'tracker_db',
+        'USER': 'postgres',
+        'PASSWORD': 'pyltregex@23',
         'HOST': 'localhost',
         'PORT': '5432',
     }

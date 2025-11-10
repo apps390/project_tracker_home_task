@@ -383,7 +383,7 @@
       }
     });
 
-   async function registerWithInvitation(firstName, lastName, password, confirmPassword) {
+async function registerWithInvitation(firstName, lastName, password, confirmPassword) {
     try {
         setButtonLoading(registerBtn, true);
 
@@ -405,40 +405,42 @@
         console.log("Response status:", response.status);
         const result = await response.json();
         console.log("Full API response:", result);
-        alert("Full API response:", result)
+
         if (response.ok && result.success) {
-            // Check if data exists
-            if (!result.data) {
-                throw new Error('No data in response');
+            if (!result.data) throw new Error('No data in response');
+
+            const tokenData = result.data || {};
+
+            const accessToken = tokenData.access || tokenData.access_token;
+            const refreshToken = tokenData.refresh || tokenData.refresh_token;
+
+            if (!accessToken || !refreshToken) {
+                throw new Error("Missing access or refresh token in response");
             }
+
+            localStorage.clear();
+            localStorage.setItem("access", accessToken);
+            localStorage.setItem("refresh", refreshToken);
+            localStorage.setItem("userEmail", tokenData.email);
+            localStorage.setItem("userRole", tokenData.role);
+
+            console.log("✅ Tokens stored successfully.");
+            console.log("Access:", localStorage.getItem("access") ? "Saved" : "Missing");
+            console.log("Role:", localStorage.getItem("userRole"));
+
+            showSuccess("Registration successful! Redirecting to your projects...");
+
+            setTimeout(() => {
+                console.log("Redirecting to /projects...");
+                window.location.href = "/projects";
+            }, 500);
             
-            // Store tokens and redirect to projects page
-            localStorage.setItem("access", result.data.access);
-            localStorage.setItem("refresh", result.data.refresh);
-            localStorage.setItem("userEmail", result.data.email);
-            localStorage.setItem("userRole", result.data.role);
-            
-            // Verify storage immediately
-            const storedAccess = localStorage.getItem("access");
-            const storedRefresh = localStorage.getItem("refresh");
-            const storedEmail = localStorage.getItem("userEmail");
-            const storedRole = localStorage.getItem("userRole");
-            
-            console.log("Stored access token:", storedAccess ? "Present" : "Missing");
-            console.log("Stored refresh token:", storedRefresh ? "Present" : "Missing");
-            console.log("Stored email:", storedEmail);
-            console.log("Stored role:", storedRole);
-            
-            // Show alerts with actual values
-           
-            
-            console.log("Redirecting to projects page...");
-            window.location.href = "/projects";
         } else {
             const errorMsg = result.message || result.errors || 'Registration failed';
-            console.log("Registration failed:", errorMsg);
+            console.error("Registration failed:", errorMsg);
             throw new Error(errorMsg);
         }
+
     } catch (error) {
         console.error('Error during registration:', error);
         showError('Registration failed: ' + error.message);
@@ -446,6 +448,7 @@
         setButtonLoading(registerBtn, false);
     }
 }
+
     function setButtonLoading(button, isLoading) {
       if (isLoading) {
         button.disabled = true;

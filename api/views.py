@@ -279,10 +279,8 @@ class ProjectInviteAPIView(generics.GenericAPIView):
                 'recipient_email': invite.email,
             }
             
-            # Render HTML content using your template from frontend directory
             html_content = render_to_string('project_invitation.html', context)
             
-            # Create plain text version (fallback)
             text_content = f"""
             You've been invited to join '{project.name}'
             
@@ -295,7 +293,6 @@ class ProjectInviteAPIView(generics.GenericAPIView):
             If you have any questions, please contact {inviter.email}
             """
             
-            # Create email message
             email = EmailMultiAlternatives(
                 subject=f"🎯 Join {project.name} on Project Tracker",
                 body=text_content,
@@ -303,17 +300,13 @@ class ProjectInviteAPIView(generics.GenericAPIView):
                 to=[invite.email],
             )
             
-            # Attach HTML version
             email.attach_alternative(html_content, "text/html")
             
-            # Send email
             email.send(fail_silently=True)
             logger.info(f"HTML invitation email sent successfully to {invite.email}")
             
         except Exception as e:
             logger.error(f"Failed to send HTML email to {invite.email}: {e}")
-            # Fallback to original plain text email
-            from django.core.mail import send_mail
             send_mail(
                 subject=f"Invitation to join project: {project.name}",
                 message=text_content,
@@ -391,7 +384,6 @@ class TaskUpdateAPIView(generics.UpdateAPIView):
 
 
     def get_queryset(self):
-        """Filter tasks based on user access"""
         user = self.request.user
         return Task.objects.filter(
             project__in=Project.objects.filter(
@@ -495,22 +487,26 @@ class TaskListAPIView(generics.ListAPIView):
         user = self.request.user
         project_slug = self.kwargs.get('slug')
         status_filter = self.request.query_params.get('status')
-
         try:
-            project = Project.objects.filter(
-                slug=project_slug,
-                is_deleted=False
-            ).filter(
-                models.Q(created_by=user) | models.Q(members__user=user)
-            ).distinct().first()
+            project = (
+                Project.objects
+                .select_related('created_by')  
+                .prefetch_related('members__user')  
+                .filter(slug=project_slug, is_deleted=False)
+                .filter(models.Q(created_by=user) | models.Q(members__user=user))
+                .distinct()
+                .first()
+            )
 
             if not project:
                 logger.warning(f"User {user.email} attempted to access tasks for project {project_slug} without permission")
                 return Task.objects.none()
 
-            queryset = Task.objects.filter(
-                project=project,
-                is_deleted=False
+            queryset = (
+                Task.objects
+                .select_related('project')  
+                .prefetch_related('assigned_to__user')  
+                .filter(project=project, is_deleted=False)
             )
 
             if status_filter:
@@ -519,7 +515,7 @@ class TaskListAPIView(generics.ListAPIView):
             return queryset.order_by('-created_at')
 
         except Exception as e:
-            logger.exception(f"Error fetching tasks for project {project_slug} and user {user.email}: {e}")
+            logger.error(f"Error fetching tasks for project {project_slug}: {e}")
             return Task.objects.none()
 
     def list(self, request, *args, **kwargs):
@@ -575,10 +571,8 @@ class ProjectMembersAPIView(generics.ListAPIView):
             if not project:
                 return build_response(False, "Project not found", status_code=status.HTTP_404_NOT_FOUND)
 
-            # Get only project members (excluding project creator)
             members = []
             
-            # Add project members only (not the creator)
             for contributor in project.members.all():
                 member_data = {
                     'id': contributor.id,
@@ -598,3 +592,76 @@ class ProjectMembersAPIView(generics.ListAPIView):
         except Exception as e:
             logger.exception(f"Error fetching project members for {slug}: {e}")
             return build_response(False, "Failed to retrieve project members", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ContributorSkillAPIView(generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = SkillSerializer
+
+    def get_object(self):
+        return get_object_or_404(Contributor, user=self.request.user)
+
+    def get(self, request):
+        try:
+            contributor = self.get_object()
+            serializer = self.get_serializer(contributor)
+            return build_response(
+                success=True,
+                message="Fetched contributor skills successfully",
+                data=serializer.data,
+                status_code=status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.error(f"Error fetching skills: {str(e)}")
+            return build_response(success=False, errors=str(e))
+
+    def post(self, request):
+        try:
+            contributor = self.get_object()
+            serializer = self.get_serializer(contributor, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return build_response(
+                success=True,
+                message="Skills added successfully",
+                data=serializer.data,
+                status_code=status.HTTP_200_OK
+            )
+
+        except ValidationError as e:
+            logger.warning(f"Validation error in ContributorSkillAPIView (POST): {e}")
+            return build_response(success=False, errors=e.detail, status_code=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Unexpected error in ContributorSkillAPIView (POST): {str(e)}")
+            return build_response(success=False, errors=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def patch(self, request):
+        try:
+            contributor = self.get_object()
+            existing_skills = contributor.skills or []
+            new_skills = request.data.get("skills", [])
+
+            if not isinstance(new_skills, list):
+                raise ValidationError({"skills": ["Skills must be provided as a list."]})
+
+            merged_skills = list({skill.lower(): skill for skill in existing_skills + new_skills}.values())
+            contributor.skills = merged_skills
+            contributor.save(update_fields=["skills"])
+
+            serializer = self.get_serializer(contributor)
+            return build_response(
+                success=True,
+                message="Skills appended successfully",
+                data=serializer.data,
+                status_code=status.HTTP_200_OK
+            )
+
+        except ValidationError as e:
+            logger.warning(f"Validation error in ContributorSkillAPIView (PATCH): {e}")
+            return build_response(success=False, errors=e.detail, status_code=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Unexpected error in ContributorSkillAPIView (PATCH): {str(e)}")
+            return build_response(success=False, errors=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
