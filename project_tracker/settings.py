@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 
@@ -24,7 +26,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)nmsnrxw+_xer)0@dmo(+cnmd2mt812+(@-hwvfqca@^g!+_jl'
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -64,7 +67,7 @@ ROOT_URLCONF = 'project_tracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "frontend"],  # 👈 Add this line
+        'DIRS': [BASE_DIR / "frontend"], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,15 +86,14 @@ WSGI_APPLICATION = 'project_tracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tracker_db',
-        'USER': 'postgres',
-        'PASSWORD': 'pyltregex@23',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
 
@@ -151,11 +153,11 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 #Emailauthentication
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'projecttracker66@gmail.com'
-EMAIL_HOST_PASSWORD = 'yqou vhyd bcxz hpnb'
+EMAIL_HOST =  os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 EMAIL_TOKEN_MAX_AGE = 300        
@@ -214,7 +216,7 @@ BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": f"redis://{os.getenv('REDIS_CACHE_HOST')}:{os.getenv('REDIS_CACHE_PORT')}/{os.getenv('REDIS_CACHE_DB')}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -222,8 +224,8 @@ CACHES = {
     }
 }
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = f"redis://{os.getenv('CELERY_REDIS_HOST')}:{os.getenv('CELERY_REDIS_PORT')}/{os.getenv('CELERY_REDIS_DB')}"
+CELERY_RESULT_BACKEND = f"redis://{os.getenv('CELERY_REDIS_HOST')}:{os.getenv('CELERY_REDIS_PORT')}/{os.getenv('CELERY_REDIS_DB')}"
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

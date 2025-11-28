@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+
+  web:
+    build: .
+    container_name: project_tracker_web
+    command: gunicorn project_tracker.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15
+    container_name: project_tracker_db
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: project_tracker_redis
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    container_name: project_tracker_celery
+    command: celery -A project_tracker worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - redis
+      - db
+
+  celery_beat:
+    build: .
+    container_name: project_tracker_celery_beat
+    command: celery -A project_tracker beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - redis
+      - db
+
+volumes:
+  postgres_data:
